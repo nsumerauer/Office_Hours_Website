@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>Student Availability</h2>
+  <p>Add your schedule for a class code so your professor can optimize office hours.</p>
+  <form method="post" action="{{ url_for('add_student') }}" class="grid-form">
+    <label>
+      Class Code
+      <input name="class_code" value="{{ class_code }}" placeholder="Example: CS4461A">
+    </label>
+    <label>
+      Student Name
+      <input name="student_name" value="{{ student_name }}" placeholder="Your name">
+    </label>
+    <fieldset class="days-fieldset">
+      <legend>Days (select one or more)</legend>
+      <div class="days-grid">
+        {% for day in days %}
+        <label class="checkbox-label">
+          <input type="checkbox" name="days" value="{{ day }}">
+          <span>{{ day }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <label>
+      Start Time
+      <input type="time" name="start_time" required>
+    </label>
+    <label>
+      End Time
+      <input type="time" name="end_time" required>
+    </label>
+    <button type="submit">Add Availability</button>
+  </form>
+</section>
+
+{% if class_code and student_name %}
+<section class="card">
+  <h3>Your Current Entries</h3>
+  {% if slots %}
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for slot in slots %}
+        <tr>
+          <td>{{ slot.day }}</td>
+          <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
+          <td>
+            <form method="post" action="{{ url_for('remove_student') }}">
+              <input type="hidden" name="class_code" value="{{ class_code }}">
+              <input type="hidden" name="student_name" value="{{ student_name }}">
+              <input type="hidden" name="slot_id" value="{{ slot.id }}">
+              <button class="danger" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No availability entries yet.</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

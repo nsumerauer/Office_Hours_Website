@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Office Hours Optimizer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Office Hours Optimizer</h1>
+      <nav>
+        <a href="{{ url_for('student_page') }}">Student Page</a>
+        <a href="{{ url_for('professor_page') }}">Professor Page</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="messages">
+          {% for category, message in messages %}
+            <p class="message {{ category }}">{{ message }}</p>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
