@@ -16,156 +16,175 @@
 </section>
 
 {% if class_code %}
-<section class="card">
-  <h3>Class Snapshot</h3>
-  <p><strong>Class:</strong> {{ class_code }}</p>
-  <p><strong>Students Submitted:</strong> {{ student_count }}</p>
-</section>
+<div class="dashboard-grid">
+  <div class="dashboard-col">
+    <section class="card">
+      <h3>Class Snapshot</h3>
+      <p><strong>Class:</strong> {{ class_code }}</p>
+      <p><strong>Students Submitted:</strong> {{ student_count }}</p>
+    </section>
 
-<section class="card">
-  <h3>Weekend Office Hours</h3>
-  <form method="post" action="{{ url_for('update_weekend_setting') }}" class="inline-form">
-    <input type="hidden" name="class_code" value="{{ class_code }}">
-    <label class="checkbox-label">
-      <input type="checkbox" name="weekend_enabled" {% if weekend_enabled %}checked{% endif %}>
-      <span>Allow Saturday/Sunday office hours</span>
-    </label>
-    <button type="submit">Save Weekend Setting</button>
-  </form>
-  <p>Current setting: <strong>{% if weekend_enabled %}Weekend enabled{% else %}Weekend disabled{% endif %}</strong></p>
-</section>
-
-<section class="card">
-  <h3>Add Professor Availability</h3>
-  <form method="post" action="{{ url_for('add_professor_availability') }}" class="grid-form">
-    <input type="hidden" name="class_code" value="{{ class_code }}">
-    <fieldset class="days-fieldset">
-      <legend>Days (select one or more)</legend>
-      <div class="days-grid">
-        {% for day in days %}
+    <section class="card">
+      <h3>Weekend Office Hours</h3>
+      <form method="post" action="{{ url_for('update_weekend_setting') }}" class="inline-form">
+        <input type="hidden" name="class_code" value="{{ class_code }}">
         <label class="checkbox-label">
-          <input type="checkbox" name="days" value="{{ day }}" {% if not weekend_enabled and (day == "Saturday" or day == "Sunday") %}disabled{% endif %}>
-          <span>{{ day }}</span>
+          <input type="checkbox" name="weekend_enabled" {% if weekend_enabled %}checked{% endif %}>
+          <span>Allow Saturday/Sunday office hours</span>
         </label>
-        {% endfor %}
-      </div>
-    </fieldset>
-    <label>
-      Start Time
-      <input type="time" name="start_time" required>
-    </label>
-    <label>
-      End Time
-      <input type="time" name="end_time" required>
-    </label>
-    <button type="submit">Add Availability</button>
-  </form>
-</section>
+        <button type="submit">Save Weekend Setting</button>
+      </form>
+      <p>Current setting: <strong>{% if weekend_enabled %}Weekend enabled{% else %}Weekend disabled{% endif %}</strong></p>
+    </section>
 
-<section class="card">
-  <h3>Your Availability</h3>
-  {% if professor_slots %}
-  <table>
-    <thead>
-      <tr>
-        <th>Day</th>
-        <th>Time</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for slot in professor_slots %}
-      <tr>
-        <td>{{ slot.day }}</td>
-        <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
-        <td>
-          <form method="post" action="{{ url_for('remove_professor_availability') }}">
-            <input type="hidden" name="class_code" value="{{ class_code }}">
-            <input type="hidden" name="slot_id" value="{{ slot.id }}">
-            <button class="danger" type="submit">Remove</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <p>No professor availability yet.</p>
-  {% endif %}
-</section>
+    <section class="card">
+      <h3>Add Professor Availability</h3>
+      <form method="post" action="{{ url_for('add_professor_availability') }}" class="grid-form">
+        <input type="hidden" name="class_code" value="{{ class_code }}">
+        <label>
+          Days (select one or more)
+        </label>
+        <fieldset class="days-fieldset">
+          <legend>Select day(s)</legend>
+          <div class="days-grid">
+            {% for day in days %}
+            <label class="checkbox-label">
+              <input type="checkbox" name="days" value="{{ day }}" {% if not weekend_enabled and (day == "Saturday" or day == "Sunday") %}disabled{% endif %}>
+              <span>{{ day }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        <label>
+          Start Time
+          <select name="start_time" required>
+            <option value="">Select start time</option>
+            {% for time_value in time_options %}
+            <option value="{{ time_value }}">{{ time_value }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          End Time
+          <select name="end_time" required>
+            <option value="">Select end time</option>
+            {% for time_value in time_options %}
+            <option value="{{ time_value }}">{{ time_value }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit">Add Availability</button>
+      </form>
+    </section>
+  </div>
 
-<section class="card">
-  <h3>Optimize Office Hours</h3>
-  <form method="post" action="{{ url_for('professor_optimize') }}">
-    <input type="hidden" name="class_code" value="{{ class_code }}">
-    <button type="submit">Find Best Times</button>
-  </form>
+  <div class="dashboard-col">
+    <section class="card">
+      <h3>Your Availability</h3>
+      {% if professor_slots %}
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for slot in professor_slots %}
+          <tr>
+            <td>{{ slot.day }}</td>
+            <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
+            <td>
+              <form method="post" action="{{ url_for('remove_professor_availability') }}">
+                <input type="hidden" name="class_code" value="{{ class_code }}">
+                <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                <button class="danger" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No professor availability yet.</p>
+      {% endif %}
+    </section>
 
-  {% if recommendations %}
-  <table>
-    <thead>
-      <tr>
-        <th>Day</th>
-        <th>Window</th>
-        <th>Expected Students</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for slot in recommendations %}
-      <tr>
-        <td>{{ slot.day }}</td>
-        <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
-        <td>{{ slot.score }}</td>
-        <td>
-          <form method="post" action="{{ url_for('add_open_hour') }}">
-            <input type="hidden" name="class_code" value="{{ class_code }}">
-            <input type="hidden" name="day" value="{{ slot.day }}">
-            <input type="hidden" name="start_minute" value="{{ slot.start_minute }}">
-            <input type="hidden" name="end_minute" value="{{ slot.end_minute }}">
-            <input type="hidden" name="score" value="{{ slot.score }}">
-            <button type="submit">Open This Time</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-</section>
+    <section class="card">
+      <h3>Optimize Office Hours</h3>
+      <form method="post" action="{{ url_for('professor_optimize') }}">
+        <input type="hidden" name="class_code" value="{{ class_code }}">
+        <button type="submit">Find Best Times</button>
+      </form>
 
-<section class="card">
-  <h3>Opened Office-Hour Times</h3>
-  {% if open_slots %}
-  <table>
-    <thead>
-      <tr>
-        <th>Day</th>
-        <th>Time</th>
-        <th>Expected Students</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for slot in open_slots %}
-      <tr>
-        <td>{{ slot.day }}</td>
-        <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
-        <td>{{ slot.expected_students }}</td>
-        <td>
-          <form method="post" action="{{ url_for('remove_open_hour') }}">
-            <input type="hidden" name="class_code" value="{{ class_code }}">
-            <input type="hidden" name="slot_id" value="{{ slot.id }}">
-            <button class="danger" type="submit">Remove</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <p>No open times yet.</p>
-  {% endif %}
-</section>
+      {% if recommendations %}
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Window</th>
+            <th>Expected Students</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for slot in recommendations %}
+          <tr>
+            <td>{{ slot.day }}</td>
+            <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
+            <td>{{ slot.score }}</td>
+            <td>
+              <form method="post" action="{{ url_for('add_open_hour') }}">
+                <input type="hidden" name="class_code" value="{{ class_code }}">
+                <input type="hidden" name="day" value="{{ slot.day }}">
+                <input type="hidden" name="start_minute" value="{{ slot.start_minute }}">
+                <input type="hidden" name="end_minute" value="{{ slot.end_minute }}">
+                <input type="hidden" name="score" value="{{ slot.score }}">
+                <button type="submit">Open This Time</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <h3>Opened Office-Hour Times</h3>
+      {% if open_slots %}
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Expected Students</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for slot in open_slots %}
+          <tr>
+            <td>{{ slot.day }}</td>
+            <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
+            <td>{{ slot.expected_students }}</td>
+            <td>
+              <form method="post" action="{{ url_for('remove_open_hour') }}">
+                <input type="hidden" name="class_code" value="{{ class_code }}">
+                <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                <button class="danger" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No open times yet.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
 {% endif %}
 {% endblock %}

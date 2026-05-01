@@ -1,72 +1,117 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="card">
-  <h2>Student Availability</h2>
-  <p>Add your schedule for a class code so your professor can optimize office hours.</p>
-  <form method="post" action="{{ url_for('add_student') }}" class="grid-form">
-    <label>
-      Class Code
-      <input name="class_code" value="{{ class_code }}" placeholder="Example: CS4461A">
-    </label>
-    <label>
-      Student Name
-      <input name="student_name" value="{{ student_name }}" placeholder="Your name">
-    </label>
-    <fieldset class="days-fieldset">
-      <legend>Days (select one or more)</legend>
-      <div class="days-grid">
-        {% for day in days %}
-        <label class="checkbox-label">
-          <input type="checkbox" name="days" value="{{ day }}">
-          <span>{{ day }}</span>
-        </label>
-        {% endfor %}
-      </div>
-    </fieldset>
-    <label>
-      Start Time
-      <input type="time" name="start_time" required>
-    </label>
-    <label>
-      End Time
-      <input type="time" name="end_time" required>
-    </label>
-    <button type="submit">Add Availability</button>
-  </form>
+<section class="card student-hero">
+  <div>
+    <h2>Student Availability</h2>
+    <p>Add your schedule blocks so your professor can find the best office-hour windows.</p>
+  </div>
+  <div class="student-hero-badges">
+    <span class="badge">10-minute time options</span>
+    <span class="badge">Multi-day checkboxes</span>
+  </div>
 </section>
 
-{% if class_code and student_name %}
-<section class="card">
-  <h3>Your Current Entries</h3>
-  {% if slots %}
-    <table>
-      <thead>
-        <tr>
-          <th>Day</th>
-          <th>Time</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for slot in slots %}
-        <tr>
-          <td>{{ slot.day }}</td>
-          <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
-          <td>
-            <form method="post" action="{{ url_for('remove_student') }}">
-              <input type="hidden" name="class_code" value="{{ class_code }}">
-              <input type="hidden" name="student_name" value="{{ student_name }}">
-              <input type="hidden" name="slot_id" value="{{ slot.id }}">
-              <button class="danger" type="submit">Remove</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No availability entries yet.</p>
+<div class="dashboard-grid student-dashboard">
+  <div class="dashboard-col">
+    <section class="card">
+      <h3>Add Availability</h3>
+      <form method="post" action="{{ url_for('add_student') }}" class="grid-form student-form">
+        <div class="student-form-block student-identity">
+          <p class="block-title">Class and Student</p>
+          <div class="student-identity-grid">
+            <label>
+              Class Code
+              <input name="class_code" value="{{ class_code }}" placeholder="Example: CS4461A">
+            </label>
+            <label>
+              Student Name
+              <input name="student_name" value="{{ student_name }}" placeholder="Your name">
+            </label>
+          </div>
+        </div>
+
+        <div class="student-form-block">
+          <p class="block-title">Days</p>
+          <fieldset class="days-fieldset">
+            <legend>Select day(s)</legend>
+            <div class="days-grid">
+              {% for day in days %}
+              <label class="checkbox-label">
+                <input type="checkbox" name="days" value="{{ day }}">
+                <span>{{ day }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="student-form-block">
+          <p class="block-title">Time Window</p>
+          <div class="student-time-grid">
+            <label>
+              Start Time
+              <select name="start_time" required>
+                <option value="">Select start time</option>
+                {% for time_value in time_options %}
+                <option value="{{ time_value }}">{{ time_value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              End Time
+              <select name="end_time" required>
+                <option value="">Select end time</option>
+                {% for time_value in time_options %}
+                <option value="{{ time_value }}">{{ time_value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="student-submit-row">
+          <button type="submit">Add Availability</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  {% if class_code and student_name %}
+  <div class="dashboard-col">
+    <section class="card">
+      <h3>Your Current Entries</h3>
+      <p class="muted">Class: <strong>{{ class_code }}</strong> | Student: <strong>{{ student_name }}</strong></p>
+      {% if slots %}
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Time</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in slots %}
+            <tr>
+              <td>{{ slot.day }}</td>
+              <td>{{ minutes_to_time(slot.start_minute) }} - {{ minutes_to_time(slot.end_minute) }}</td>
+              <td>
+                <form method="post" action="{{ url_for('remove_student') }}">
+                  <input type="hidden" name="class_code" value="{{ class_code }}">
+                  <input type="hidden" name="student_name" value="{{ student_name }}">
+                  <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                  <button class="danger" type="submit">Remove</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No availability entries yet.</p>
+      {% endif %}
+    </section>
+  </div>
   {% endif %}
-</section>
-{% endif %}
+</div>
 {% endblock %}

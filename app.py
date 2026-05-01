@@ -25,6 +25,9 @@ from storage import (
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 WEEKEND_DAYS = {"Saturday", "Sunday"}
+TIME_INCREMENT_MINUTES = 10
+DAY_START_MINUTE = 9 * 60
+DAY_END_MINUTE = 19 * 60
 
 
 def parse_time_to_minutes(value: str) -> int:
@@ -36,6 +39,10 @@ def minutes_to_time(value: int) -> str:
     hours = value // 60
     minutes = value % 60
     return f"{hours:02d}:{minutes:02d}"
+
+
+def build_time_options(step_minutes: int = TIME_INCREMENT_MINUTES) -> list[str]:
+    return [minutes_to_time(value) for value in range(DAY_START_MINUTE, DAY_END_MINUTE + 1, step_minutes)]
 
 
 def normalize_code(value: str) -> str:
@@ -58,6 +65,14 @@ def filter_weekend_days(days: list[str], weekend_enabled: bool) -> list[str]:
     return [day for day in days if day not in WEEKEND_DAYS]
 
 
+def times_match_increment(*minutes: int) -> bool:
+    return all(value % TIME_INCREMENT_MINUTES == 0 for value in minutes)
+
+
+def times_within_allowed_range(*minutes: int) -> bool:
+    return all(DAY_START_MINUTE <= value <= DAY_END_MINUTE for value in minutes)
+
+
 app = Flask(__name__)
 app.secret_key = "dev-secret-key-change-in-production"
 init_db()
@@ -65,7 +80,11 @@ init_db()
 
 @app.context_processor
 def helpers():
-    return {"minutes_to_time": minutes_to_time, "days": DAYS}
+    return {
+        "minutes_to_time": minutes_to_time,
+        "days": DAYS,
+        "time_options": build_time_options(),
+    }
 
 
 @app.route("/")
@@ -106,6 +125,12 @@ def add_student():
 
     start_minute = parse_time_to_minutes(start_time)
     end_minute = parse_time_to_minutes(end_time)
+    if not times_within_allowed_range(start_minute, end_minute):
+        flash("Times must be between 09:00 and 19:00.", "error")
+        return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
+    if not times_match_increment(start_minute, end_minute):
+        flash("Times must be in 10-minute increments.", "error")
+        return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
     if end_minute <= start_minute:
         flash("End time must be after start time.", "error")
         return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
@@ -169,6 +194,12 @@ def add_professor_availability():
 
     start_minute = parse_time_to_minutes(start_time)
     end_minute = parse_time_to_minutes(end_time)
+    if not times_within_allowed_range(start_minute, end_minute):
+        flash("Times must be between 09:00 and 19:00.", "error")
+        return redirect(url_for("professor_page", class_code=class_code))
+    if not times_match_increment(start_minute, end_minute):
+        flash("Times must be in 10-minute increments.", "error")
+        return redirect(url_for("professor_page", class_code=class_code))
     if end_minute <= start_minute:
         flash("End time must be after start time.", "error")
         return redirect(url_for("professor_page", class_code=class_code))
