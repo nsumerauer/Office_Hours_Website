@@ -2,6 +2,9 @@
 
 A Python web app for collecting student schedule availability and helping a professor choose office-hour times that maximize student attendance.
 
+## Link To Website
+- https://ai-final-gamma.vercel.app/ 
+
 ## Features
 
 - Two-page workflow:
