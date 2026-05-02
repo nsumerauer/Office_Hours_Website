@@ -6,16 +6,73 @@
   <title>Office Hours Optimizer</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
+<body data-theme="default">
   <header class="site-header">
     <div class="container">
       <h1>Office Hours Optimizer</h1>
       <nav>
-        <a href="{{ url_for('student_page') }}">Student Page</a>
-        <a href="{{ url_for('professor_page') }}">Professor Page</a>
+        <div class="nav-dropdown">
+          <button class="dropdown-toggle">Navigation</button>
+          <div class="dropdown-menu">
+            <a href="{{ url_for('student_page') }}" class="dropdown-item">Student Page</a>
+            <a href="{{ url_for('professor_page') }}" class="dropdown-item">Professor Page</a>
+            <div class="dropdown-divider"></div>
+            <p class="dropdown-label">Themes</p>
+            <button data-theme="default" class="theme-option dropdown-item">Default (Blue)</button>
+            <button data-theme="ocean" class="theme-option dropdown-item">Ocean (Teal)</button>
+            <button data-theme="forest" class="theme-option dropdown-item">Forest (Green)</button>
+            <button data-theme="sunset" class="theme-option dropdown-item">Sunset (Orange)</button>
+            <button data-theme="royal" class="theme-option dropdown-item">Royal (Purple)</button>
+          </div>
+        </div>
       </nav>
     </div>
   </header>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropdown = document.querySelector('.nav-dropdown');
+      const toggle = document.querySelector('.dropdown-toggle');
+      const menu = document.querySelector('.dropdown-menu');
+      const themeOptions = document.querySelectorAll('.theme-option');
+      const body = document.body;
+      
+      // Load saved theme
+      const savedTheme = localStorage.getItem('site-theme') || 'default';
+      body.setAttribute('data-theme', savedTheme);
+      updateThemeButton(savedTheme);
+      
+      toggle.addEventListener('click', function() {
+        menu.classList.toggle('active');
+      });
+      
+      document.addEventListener('click', function(event) {
+        if (!dropdown.contains(event.target)) {
+          menu.classList.remove('active');
+        }
+      });
+      
+      // Theme switching
+      themeOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.preventDefault();
+          const theme = this.getAttribute('data-theme');
+          body.setAttribute('data-theme', theme);
+          localStorage.setItem('site-theme', theme);
+          updateThemeButton(theme);
+        });
+      });
+      
+      function updateThemeButton(activeTheme) {
+        themeOptions.forEach(option => {
+          option.classList.remove('active');
+          if (option.getAttribute('data-theme') === activeTheme) {
+            option.classList.add('active');
+          }
+        });
+      }
+    });
+  </script>
 
   <main class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
