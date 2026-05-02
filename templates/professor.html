@@ -119,6 +119,15 @@
       </form>
 
       {% if recommendations %}
+      <div class="sort-controls">
+        <label for="sort-select">Sort by:</label>
+        <select id="sort-select" class="sort-select">
+          <option value="default">Default (Expected Students)</option>
+          <option value="students">Expected Students (High to Low)</option>
+          <option value="time">Time Window (Early to Late)</option>
+          <option value="day">Day (Mon - Sun)</option>
+        </select>
+      </div>
       <table>
         <thead>
           <tr>
@@ -187,4 +196,63 @@
   </div>
 </div>
 {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sortSelect = document.getElementById('sort-select');
+    if (!sortSelect) return;
+    
+    const recommendationsTable = document.querySelector('.card:has(> .sort-controls) table tbody');
+    if (!recommendationsTable) return;
+    
+    const dayOrder = {
+      'Monday': 1,
+      'Tuesday': 2,
+      'Wednesday': 3,
+      'Thursday': 4,
+      'Friday': 5,
+      'Saturday': 6,
+      'Sunday': 7
+    };
+    
+    function sortTable(sortBy) {
+      const rows = Array.from(recommendationsTable.querySelectorAll('tr'));
+      
+      rows.sort((a, b) => {
+        const cellsA = a.querySelectorAll('td');
+        const cellsB = b.querySelectorAll('td');
+        
+        const dayA = cellsA[0].textContent.trim();
+        const dayB = cellsB[0].textContent.trim();
+        
+        const timeA = cellsA[1].textContent.trim();
+        const timeB = cellsB[1].textContent.trim();
+        
+        const scoreA = parseInt(cellsA[2].textContent.trim());
+        const scoreB = parseInt(cellsB[2].textContent.trim());
+        
+        switch(sortBy) {
+          case 'students':
+            return scoreB - scoreA;
+          case 'time':
+            const startA = timeA.split(' - ')[0];
+            const startB = timeB.split(' - ')[0];
+            return startA.localeCompare(startB);
+          case 'day':
+            return (dayOrder[dayA] || 8) - (dayOrder[dayB] || 8);
+          case 'default':
+          default:
+            return scoreB - scoreA;
+        }
+      });
+      
+      rows.forEach(row => recommendationsTable.appendChild(row));
+    }
+    
+    sortSelect.addEventListener('change', function() {
+      sortTable(this.value);
+    });
+  });
+</script>
+
 {% endblock %}
