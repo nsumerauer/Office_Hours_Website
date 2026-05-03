@@ -35,13 +35,13 @@ A Python web app for collecting student schedule availability and helping a prof
 2. Install dependencies:
 
    ```bash
-   py -m pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 3. Run the app:
 
    ```bash
-   py app.py
+   python app.py
    ```
 
 4. Open:
@@ -53,8 +53,8 @@ A Python web app for collecting student schedule availability and helping a prof
 From the project directory:
 
 ```bash
-py -m pip install -r requirements.txt
-py -m pytest -q
+python -m pip install -r requirements.txt
+python -m pytest -q
 ```
 
 Expected result:
