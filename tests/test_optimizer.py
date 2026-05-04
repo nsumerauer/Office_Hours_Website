@@ -1,7 +1,7 @@
 from optimizer import optimize_hours
 
 
-def test_optimize_hours_ranks_highest_overlap_first():
+def test_optimize_hours_ranks_highest_students_free_from_class_first():
     student_slots = [
         {"day": "Monday", "student_name": "A", "start_minute": 600, "end_minute": 720},
         {"day": "Monday", "student_name": "B", "start_minute": 630, "end_minute": 750},
@@ -13,8 +13,8 @@ def test_optimize_hours_ranks_highest_overlap_first():
 
     assert len(results) == 3
     assert results[0]["day"] == "Monday"
-    assert results[0]["start_minute"] == 660
-    assert results[0]["end_minute"] == 720
+    assert results[0]["start_minute"] == 780
+    assert results[0]["end_minute"] == 840
     assert results[0]["score"] == 3
 
 

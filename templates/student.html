@@ -2,8 +2,8 @@
 {% block content %}
 <section class="card student-hero">
   <div>
-    <h2>Student Availability</h2>
-    <p>Add your schedule blocks so your professor can find the best office-hour windows.</p>
+    <h2>Student Class Times</h2>
+    <p>Add the times your classes meet so your professor can avoid those windows when planning office hours.</p>
   </div>
   <div class="student-hero-badges">
     <span class="badge">10-minute time options</span>
@@ -14,7 +14,7 @@
 <div class="dashboard-grid student-dashboard">
   <div class="dashboard-col">
     <section class="card">
-      <h3>Add Availability</h3>
+      <h3>Add Class Time</h3>
       <form method="post" action="{{ url_for('add_student') }}" class="grid-form student-form">
         <div class="student-form-block student-identity">
           <p class="block-title">Class and Student</p>
@@ -70,7 +70,7 @@
         </div>
 
         <div class="student-submit-row">
-          <button type="submit">Add Availability</button>
+          <button type="submit">Add Class Time</button>
         </div>
       </form>
     </section>
@@ -108,7 +108,7 @@
           </tbody>
         </table>
       {% else %}
-        <p>No availability entries yet.</p>
+        <p>No class-time entries yet.</p>
       {% endif %}
     </section>
   </div>

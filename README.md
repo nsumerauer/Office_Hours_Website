@@ -1,6 +1,6 @@
 # Office Hours Optimizer (AI Final Project)
 
-A Python web app for collecting student schedule availability and helping a professor choose office-hour times that maximize student attendance.
+A Python web app for collecting student class times and helping a professor choose office-hour times that maximize student attendance by avoiding those class blocks.
 
 ## Link To Website
 - https://ai-final-gamma.vercel.app/ 
@@ -8,7 +8,7 @@ A Python web app for collecting student schedule availability and helping a prof
 ## Features
 
 - Two-page workflow:
-  - Student page to submit availability by class code.
+  - Student page to submit class times by class code.
   - Professor page to add availability and optimize office-hour windows.
 - Multi-day schedule entry (for example M/W/F in one submit).
 - Professor weekend toggle (enable/disable Saturday and Sunday office hours).
@@ -17,7 +17,7 @@ A Python web app for collecting student schedule availability and helping a prof
   - student schedule intervals
   - professor availability intervals
   - opened office-hour times
-- Optimization engine ranks 60-minute windows (in 30-minute increments) by expected student coverage.
+- Optimization engine ranks 60-minute windows (in 30-minute increments) by expected students free from class.
 - Ability to open recommended times and manage them.
 - One-click website demo loader for class code `1234`.
 
@@ -75,7 +75,7 @@ After deployment, open your public Vercel URL and use:
 
 1. `/student`
    - Enter class code and student name
-   - Add one or more day/time availability blocks
+   - Add one or more day/time class blocks
 2. `/professor`
    - Enter the same class code
    - Add professor availability

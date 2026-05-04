@@ -9,16 +9,19 @@ def minute_range(start_minute: int, end_minute: int, step: int = SLOT_MINUTES) -
     return list(range(start_minute, end_minute, step))
 
 
-def overlaps(outer_start: int, outer_end: int, inner_start: int, inner_end: int) -> bool:
-    return inner_start >= outer_start and inner_end <= outer_end
+def overlaps(first_start: int, first_end: int, second_start: int, second_end: int) -> bool:
+    return first_start < second_end and second_start < first_end
 
 
 def optimize_hours(
     student_slots: list[dict], professor_slots: list[dict], top_n: int = 5
 ) -> list[dict]:
+    # student_slots are class times. We score office-hour windows where students are not in class.
     per_day_student = defaultdict(list)
+    all_students = set()
     for slot in student_slots:
         per_day_student[slot["day"]].append(slot)
+        all_students.add(slot["student_name"])
 
     scored_windows: list[dict] = []
     for prof_slot in professor_slots:
@@ -30,7 +33,7 @@ def optimize_hours(
             if candidate_end > end:
                 continue
 
-            available_students = set()
+            students_in_class = set()
             for student_slot in per_day_student.get(day, []):
                 if overlaps(
                     student_slot["start_minute"],
@@ -38,7 +41,8 @@ def optimize_hours(
                     candidate_start,
                     candidate_end,
                 ):
-                    available_students.add(student_slot["student_name"])
+                    students_in_class.add(student_slot["student_name"])
+            available_students = all_students - students_in_class
 
             scored_windows.append(
                 {

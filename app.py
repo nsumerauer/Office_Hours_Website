@@ -120,7 +120,7 @@ def add_student():
         flash(f"No class code entered. Generated code: {class_code}", "info")
 
     if not student_name or not selected_days or not start_time or not end_time:
-        flash("Please complete all fields for student availability.", "error")
+        flash("Please complete all fields for class times.", "error")
         return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
 
     start_minute = parse_time_to_minutes(start_time)
@@ -137,7 +137,7 @@ def add_student():
 
     for day in selected_days:
         add_student_slot(class_code, student_name, day, start_minute, end_minute)
-    flash(f"Availability added for {len(selected_days)} day(s).", "success")
+    flash(f"Class time added for {len(selected_days)} day(s).", "success")
     return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
 
 
@@ -147,7 +147,7 @@ def remove_student():
     student_name = request.form.get("student_name", "").strip()
     slot_id = int(request.form.get("slot_id", "0"))
     remove_student_slot(slot_id)
-    flash("Availability removed.", "success")
+    flash("Class time removed.", "success")
     return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
 
 
@@ -169,6 +169,7 @@ def professor_page():
         student_count=student_count,
         weekend_enabled=weekend_enabled,
         recommendations=[],
+        selected_day="",
     )
 
 
@@ -224,9 +225,13 @@ def remove_professor_availability():
 @app.post("/professor/optimize")
 def professor_optimize():
     class_code = normalize_code(request.form.get("class_code", ""))
+    selected_day = request.form.get("selected_day", "").strip()
     if not class_code:
         flash("Class code is required for optimization.", "error")
         return redirect(url_for("professor_page"))
+    if selected_day and selected_day not in DAYS:
+        flash("Please choose a valid day filter.", "error")
+        return redirect(url_for("professor_page", class_code=class_code))
 
     student_slots = as_dicts(get_student_slots(class_code))
     professor_slots = as_dicts(get_professor_slots(class_code))
@@ -237,9 +242,15 @@ def professor_optimize():
         student_slots = [slot for slot in student_slots if slot["day"] not in WEEKEND_DAYS]
         professor_slots = [slot for slot in professor_slots if slot["day"] not in WEEKEND_DAYS]
         open_slots = [slot for slot in open_slots if slot["day"] not in WEEKEND_DAYS]
+    if selected_day and not weekend_enabled and selected_day in WEEKEND_DAYS:
+        flash("Weekend is disabled for this class. Choose a weekday filter.", "error")
+        return redirect(url_for("professor_page", class_code=class_code))
+    if selected_day:
+        student_slots = [slot for slot in student_slots if slot["day"] == selected_day]
+        professor_slots = [slot for slot in professor_slots if slot["day"] == selected_day]
     recommendations = optimize_hours(student_slots, professor_slots, top_n=8)
     if not recommendations:
-        flash("No recommendation windows found. Add more availability data.", "info")
+        flash("No recommendation windows found. Add more class times or professor availability.", "info")
 
     return render_template(
         "professor.html",
@@ -249,6 +260,7 @@ def professor_optimize():
         student_count=student_count,
         weekend_enabled=weekend_enabled,
         recommendations=recommendations,
+        selected_day=selected_day,
     )
 
 
