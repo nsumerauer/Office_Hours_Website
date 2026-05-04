@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <div></div>
+  <a href="{{ url_for('professor_logout') }}" style="padding: 0.5rem 1rem; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9rem;">Logout</a>
+</div>
 <section class="card">
   <h2>Professor Console</h2>
   <p>Use your class code, add your availability, and compute the best office-hour windows.</p>

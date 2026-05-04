@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card" style="max-width: 500px; margin: 2rem auto;">
+  <h2>Professor Login</h2>
+  <form method="post" action="{{ url_for('professor_login') }}" class="form-vertical">
+    <label>
+      Username
+      <input type="text" name="username" placeholder="Enter username" required autofocus>
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" placeholder="Enter password" required>
+    </label>
+    <button type="submit" style="width: 100%;">Login</button>
+  </form>
+  
+  <div style="margin-top: 2rem; padding: 1rem; background-color: #f5f5f5; border-radius: 4px; border-left: 4px solid #007bff;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>Demo Credentials:</strong></p>
+    <p style="margin: 0.25rem 0;"><strong>Username:</strong> admin</p>
+    <p style="margin: 0.25rem 0;"><strong>Password:</strong> password</p>
+  </div>
+</section>
+{% endblock %}
