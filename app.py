@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 from optimizer import optimize_hours
 from seed_test_data import seed_demo_class
@@ -151,8 +151,41 @@ def remove_student():
     return redirect(url_for("student_page", class_code=class_code, student_name=student_name))
 
 
+@app.route("/professor-login", methods=["GET", "POST"])
+def professor_login():
+    if request.method == "GET":
+        return render_template("login.html")
+    
+    # POST request - handle login
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "").strip()
+    
+    # Hard-coded credentials
+    DEMO_USERNAME = "admin"
+    DEMO_PASSWORD = "password"
+    
+    if username == DEMO_USERNAME and password == DEMO_PASSWORD:
+        session["professor_logged_in"] = True
+        flash("Login successful! Welcome to the Professor Console.", "success")
+        return redirect(url_for("professor_page"))
+    else:
+        flash("Invalid username or password. Please try again.", "error")
+        return render_template("login.html")
+
+
+@app.route("/professor-logout")
+def professor_logout():
+    session.pop("professor_logged_in", None)
+    flash("You have been logged out.", "info")
+    return redirect(url_for("student_page"))
+
+
 @app.route("/professor")
 def professor_page():
+    # Check if user is logged in
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.args.get("class_code", ""))
     professor_slots = as_dicts(get_professor_slots(class_code)) if class_code else []
     open_slots = as_dicts(get_open_slots(class_code)) if class_code else []
@@ -175,6 +208,9 @@ def professor_page():
 
 @app.post("/professor/add-availability")
 def add_professor_availability():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     selected_days = parse_selected_days(request.form)
     start_time = request.form.get("start_time", "")
@@ -215,6 +251,9 @@ def add_professor_availability():
 
 @app.post("/professor/remove-availability")
 def remove_professor_availability():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     slot_id = int(request.form.get("slot_id", "0"))
     remove_professor_slot(slot_id)
@@ -224,6 +263,9 @@ def remove_professor_availability():
 
 @app.post("/professor/optimize")
 def professor_optimize():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     selected_day = request.form.get("selected_day", "").strip()
     if not class_code:
@@ -266,6 +308,9 @@ def professor_optimize():
 
 @app.post("/professor/weekend-setting")
 def update_weekend_setting():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     if not class_code:
         flash("Class code is required to update weekend settings.", "error")
@@ -282,6 +327,9 @@ def update_weekend_setting():
 
 @app.post("/professor/load-demo")
 def load_demo_data():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = "1234"
     seed_demo_class(class_code)
     flash("Demo data loaded for class code 1234. You can now test optimization.", "success")
@@ -290,6 +338,9 @@ def load_demo_data():
 
 @app.post("/professor/open")
 def add_open_hour():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     day = request.form.get("day", "")
     start_minute = int(request.form.get("start_minute", "0"))
@@ -302,6 +353,9 @@ def add_open_hour():
 
 @app.post("/professor/remove-open")
 def remove_open_hour():
+    if not session.get("professor_logged_in"):
+        return redirect(url_for("professor_login"))
+    
     class_code = normalize_code(request.form.get("class_code", ""))
     slot_id = int(request.form.get("slot_id", "0"))
     delete_open_slot(slot_id)
