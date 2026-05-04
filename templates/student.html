@@ -21,7 +21,7 @@
           <div class="student-identity-grid">
             <label>
               Class Code
-              <input name="class_code" value="{{ class_code }}" placeholder="Example: CS4461A">
+              <input name="class_code" value="{{ class_code }}" placeholder="CS4461A">
             </label>
             <label>
               Student Name
@@ -51,7 +51,7 @@
             <label>
               Start Time
               <select name="start_time" required>
-                <option value="">Select start time</option>
+                <option value="">Select</option>
                 {% for time_value in time_options %}
                 <option value="{{ time_value }}">{{ time_value }}</option>
                 {% endfor %}
@@ -60,7 +60,7 @@
             <label>
               End Time
               <select name="end_time" required>
-                <option value="">Select end time</option>
+                <option value="">Select</option>
                 {% for time_value in time_options %}
                 <option value="{{ time_value }}">{{ time_value }}</option>
                 {% endfor %}
