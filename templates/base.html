@@ -11,6 +11,9 @@
     <div class="container">
       <h1>Office Hours Optimizer</h1>
       <nav>
+        <button id="viewport-toggle" class="viewport-toggle" title="Toggle between mobile and desktop view">
+          <span class="viewport-icon">📱</span>
+        </button>
         <div class="nav-dropdown">
           <button class="dropdown-toggle">Navigation</button>
           <div class="dropdown-menu">
@@ -30,7 +33,61 @@
   </header>
   
   <script>
+    // Viewport Toggle Logic
+    function initializeViewportToggle() {
+      const viewportToggle = document.getElementById('viewport-toggle');
+      const htmlElement = document.documentElement;
+      
+      // Determine initial viewport
+      function getInitialViewport() {
+        const savedViewport = localStorage.getItem('forced-viewport');
+        if (savedViewport) {
+          return savedViewport;
+        }
+        // Auto-detect based on screen size
+        return window.innerWidth < 768 ? 'mobile' : 'desktop';
+      }
+      
+      // Set initial viewport
+      const initialViewport = getInitialViewport();
+      htmlElement.setAttribute('data-viewport', initialViewport);
+      updateViewportButton(initialViewport);
+      
+      // Handle window resize (for auto-detection when not forced)
+      window.addEventListener('resize', function() {
+        const savedViewport = localStorage.getItem('forced-viewport');
+        if (!savedViewport) {
+          const newViewport = window.innerWidth < 768 ? 'mobile' : 'desktop';
+          htmlElement.setAttribute('data-viewport', newViewport);
+          updateViewportButton(newViewport);
+        }
+      });
+      
+      // Toggle button click
+      viewportToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentViewport = htmlElement.getAttribute('data-viewport');
+        const newViewport = currentViewport === 'mobile' ? 'desktop' : 'mobile';
+        
+        htmlElement.setAttribute('data-viewport', newViewport);
+        localStorage.setItem('forced-viewport', newViewport);
+        updateViewportButton(newViewport);
+      });
+      
+      function updateViewportButton(viewport) {
+        const icon = viewportToggle.querySelector('.viewport-icon');
+        viewportToggle.setAttribute('title', 
+          viewport === 'mobile' 
+            ? 'Currently in Mobile View - Click to switch to Desktop' 
+            : 'Currently in Desktop View - Click to switch to Mobile'
+        );
+        icon.textContent = viewport === 'mobile' ? '📱' : '🖥️';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+      initializeViewportToggle();
+      
       const dropdown = document.querySelector('.nav-dropdown');
       const toggle = document.querySelector('.dropdown-toggle');
       const menu = document.querySelector('.dropdown-menu');
