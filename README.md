@@ -80,6 +80,7 @@ After deployment, open your public Vercel URL and use:
    - Enter the same class code
    - Add professor availability
    - (Optional) set weekend on/off
+   - (Optional) choose a day filter (for example Monday) before finding best times
    - Click **Find Best Times** and optionally **Open This Time**
 
 ## Testing Mode (Demo Data from Website)
