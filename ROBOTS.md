@@ -8,9 +8,10 @@ The app helps faculty choose office-hour times that best fit student schedules u
 
 ## Project Rules for AI Contributors
 
-- Preserve the two-page workflow:
-  - Student submission page
-  - Professor optimization page
+- Preserve the student and professor workflow:
+  - Student submission page at `/student`
+  - Professor login at `/professor-login`
+  - Professor scheduling console at `/professor`
 - Keep class-code isolation in all new features.
 - Maintain Python + Flask architecture unless explicitly requested otherwise.
 - Keep deployment compatibility with Vercel Python routing.
@@ -18,6 +19,7 @@ The app helps faculty choose office-hour times that best fit student schedules u
 - Avoid introducing breaking schema changes without migration guidance.
 - Keep UI simple, readable, and classroom-appropriate.
 - Preserve the professor demo-loader flow for class code `1234` unless explicitly replaced.
+- Keep authentication behavior and session checks consistent across professor-only routes.
 
 ## Quality Expectations
 
@@ -25,11 +27,12 @@ The app helps faculty choose office-hour times that best fit student schedules u
 - Keep time logic consistent (minutes from midnight).
 - Ensure optimization remains deterministic and easy to explain.
 - Keep weekend enable/disable behavior enforced in both UI and backend logic.
-- Add tests if a testing framework is introduced later.
+- Add or update tests when changing scheduling, auth, or optimization behavior.
 
 ## Security and Privacy
 
 - Do not hardcode production secrets.
+- Replace demo credentials before production use.
 - Avoid collecting unnecessary personal data.
 - Keep data scoped to class-code use cases only.
 
